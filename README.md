@@ -60,17 +60,25 @@ Use o seguinte padrão para nomear suas branches:
 
 Siga o padrão para realizar os commits:
 
+```
 <tipo>(escopo opcional): descrição
+```
 
 Tipos mais comuns:
 
-- feat: nova funcionalidade
-- fix: correção de bug
-- chore: tarefas de manutenção (builds, configs, etc.)
-- docs: apenas documentação
-- refactor: refatoração de código (sem nova feature ou bug fix)
-- test: testes
-- style: formatação, identação, etc. (sem alteração de código funcional)
+- `feat`: nova funcionalidade
+- `fix`: correção de bug
+- `chore`: tarefas de manutenção (builds, configs, etc.)
+- `docs`: apenas documentação
+- `refactor`: refatoração de código (sem nova feature ou bug fix)
+- `test`: testes
+- `style`: formatação, identação, etc. (sem alteração de código funcional)
+
+Exemplo:
+
+```
+feat(lambda): adiciona tratamento de erro
+```
 
 
 
