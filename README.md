@@ -41,10 +41,8 @@ terraform plan
 terraform apply
 ```
 
----
-
 ## Como colaborar
----
+
 Para colaborar com o projeto e propor mudanças é necessario a abertura de Pull Requests (PRs)
 
 ### Convenção de nomes de branches
