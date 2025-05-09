@@ -26,8 +26,20 @@ resource "aws_lambda_function" "funcao_um" {
   role          = aws_iam_role.lambda_exec.arn
   handler       = "org.example.FuncaoUmHandler::handleRequest"
   runtime       = "java17"
-  filename      = "${path.module}/build/hello-lambda.jar"
-  source_code_hash = filebase64sha256("${path.module}/build/hello-lambda.jar")
+  filename      = "${path.module}/../lambda/funcao-um/target/funcao-um-1.0-SNAPSHOT.jar"
+  source_code_hash = filebase64sha256("${path.module}/../lambda/funcao-um/target/funcao-um-1.0-SNAPSHOT.jar")
+  timeout       = 10
+
+  depends_on = [aws_iam_role_policy_attachment.lambda_basic_execution]
+}
+
+resource "aws_lambda_function" "funcao_dois" {
+  function_name = "funcao-dois-java"
+  role          = aws_iam_role.lambda_exec.arn
+  handler       = "org.example.FuncaoDoisHandler::handleRequest"
+  runtime       = "java17"
+  filename      = "${path.module}/../lambda/funcao-dois/target/funcao-dois-1.0-SNAPSHOT.jar"
+  source_code_hash = filebase64sha256("${path.module}/../lambda/funcao-dois/target/funcao-dois-1.0-SNAPSHOT.jar")
   timeout       = 10
 
   depends_on = [aws_iam_role_policy_attachment.lambda_basic_execution]
