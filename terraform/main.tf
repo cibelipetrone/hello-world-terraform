@@ -21,6 +21,27 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+resource "aws_iam_role_policy" "lambda_dynamo_policy" {
+  name = "lambda-dynamo-policy"
+  role = aws_iam_role.lambda_exec.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = "dynamodb:PutItem"
+        Effect   = "Allow"
+        Resource = "arn:aws:dynamodb:sa-east-1:419939494689:table/ListaMercado"
+      },
+      {
+        Action   = "dynamodb:Query"
+        Effect   = "Allow"
+        Resource = "arn:aws:dynamodb:sa-east-1:419939494689:table/ListaMercado"
+      }
+    ]
+  })
+}
+
 resource "aws_lambda_function" "funcao_um" {
   function_name = "funcao-um-java"
   role          = aws_iam_role.lambda_exec.arn
@@ -30,7 +51,10 @@ resource "aws_lambda_function" "funcao_um" {
   source_code_hash = filebase64sha256("${path.module}/../lambda/funcao-um/target/funcao-um-1.0-SNAPSHOT.jar")
   timeout       = 10
 
-  depends_on = [aws_iam_role_policy_attachment.lambda_basic_execution]
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_basic_execution,
+    aws_iam_role_policy.lambda_dynamo_policy
+  ]
 }
 
 resource "aws_lambda_function" "funcao_dois" {
@@ -40,7 +64,31 @@ resource "aws_lambda_function" "funcao_dois" {
   runtime       = "java17"
   filename      = "${path.module}/../lambda/funcao-dois/target/funcao-dois-1.0-SNAPSHOT.jar"
   source_code_hash = filebase64sha256("${path.module}/../lambda/funcao-dois/target/funcao-dois-1.0-SNAPSHOT.jar")
-  timeout       = 10
+  timeout       = 30
 
-  depends_on = [aws_iam_role_policy_attachment.lambda_basic_execution]
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_basic_execution,
+    aws_iam_role_policy.lambda_dynamo_policy
+  ]
+}
+
+resource "aws_dynamodb_table" "lista_mercado" {
+  name         = "ListaMercado"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "PK"
+  range_key    = "SK"
+
+  attribute {
+    name = "PK"
+    type = "S"
+  }
+
+  attribute {
+    name = "SK"
+    type = "S"
+  }
+
+  tags = {
+    Environment = "dev"
+  }
 }
