@@ -76,7 +76,7 @@ resource "aws_lambda_function" "funcao_dois" {
 resource "aws_lambda_function" "funcao-tres" {
   function_name = "funcao-tres-java"
   role          = aws_iam_role.lambda_exec.arn
-  handler       = "org.example.FuncaoUmHandler::handleRequest"
+  handler       = "org.example.FuncaoTresHandler::handleRequest"
   runtime       = "java17"
   filename      = "${path.module}/../lambda/funcao-tres/target/funcao-tres-1.0-SNAPSHOT.jar"
   source_code_hash = filebase64sha256("${path.module}/../lambda/funcao-tres/target/funcao-tres-1.0-SNAPSHOT.jar")

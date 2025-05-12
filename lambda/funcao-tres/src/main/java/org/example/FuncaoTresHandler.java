@@ -26,8 +26,8 @@ public class FuncaoTresHandler implements RequestHandler<Map<String, Object>, Ma
                 return createErrorResponse(400, "Campos obrigatórios 'itemId' e 'dataAtual' são necessários.");
             }
 
-            String pkAtual = "LIST#" + dataAtual;
-            String sk = "ITEM#" + itemId;
+            String pkAtual = dataAtual;
+            String sk = "item#" + itemId;
 
             GetItemRequest getRequest = GetItemRequest.builder()
                     .tableName(TABLE_NAME)
@@ -43,7 +43,7 @@ public class FuncaoTresHandler implements RequestHandler<Map<String, Object>, Ma
                 return createErrorResponse(404, "Item não encontrado para a chave fornecida.");
             }
 
-            String pkNova = novaData != null ? "LIST#" + novaData : pkAtual;
+            String pkNova = novaData != null ? novaData : pkAtual;
 
             // Atualização simples (sem nova data)
             if (pkAtual.equals(pkNova)) {
