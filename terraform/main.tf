@@ -88,3 +88,18 @@ resource "aws_lambda_function" "funcao-tres" {
   ]
 }
 
+resource "aws_lambda_function" "funcao-quatro" {
+  function_name = "funcao-quatro-java"
+  role          = aws_iam_role.lambda_exec.arn
+  handler       = "org.example.FuncaoQuatroHandler::handleRequest"
+  runtime       = "java17"
+  filename      = "${path.module}/../lambda/funcao-quatro/target/funcao-quatro-1.0-SNAPSHOT.jar"
+  source_code_hash = filebase64sha256("${path.module}/../lambda/funcao-quatro/target/funcao-quatro-1.0-SNAPSHOT.jar")
+  timeout       = 30
+
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_basic_execution,
+    aws_iam_role_policy.lambda_dynamo_policy
+  ]
+}
+

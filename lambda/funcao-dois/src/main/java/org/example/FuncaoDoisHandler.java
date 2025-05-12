@@ -25,7 +25,7 @@ public class FuncaoDoisHandler implements RequestHandler<Map<String, Object>, Ma
             throw new IllegalArgumentException("Campos obrigatórios 'name' e 'date' são necessários.");
         }
 
-        String pk = data.replace("-", "");
+        String pk = "list#" + data.replace("-", "");
         String itemId = UUID.randomUUID().toString();
         String sk = "item#" + itemId;
         String createdAt = Instant.now().toString();
