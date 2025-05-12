@@ -11,6 +11,7 @@
     <modules>
         <module>lambda/funcao-um</module>
         <module>lambda/funcao-dois</module>
+        <module>lambda/funcao-tres</module>
     </modules>
     <dependencies>
         <dependency>
