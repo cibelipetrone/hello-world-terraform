@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "sa-east-1"
+  region = var.region
 }
 
 resource "aws_iam_role" "lambda_exec" {
@@ -26,7 +26,7 @@ resource "aws_iam_role_policy" "lambda_dynamo_policy" {
   role = aws_iam_role.lambda_exec.id
 
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [
       {
         Action = [
@@ -35,71 +35,55 @@ resource "aws_iam_role_policy" "lambda_dynamo_policy" {
           "dynamodb:UpdateItem",
           "dynamodb:DeleteItem",
           "dynamodb:Query"
-        ]
-        Effect   = "Allow"
-        Resource = "arn:aws:dynamodb:sa-east-1:419939494689:table/ListaMercado"
+        ],
+        Effect   = "Allow",
+        Resource = var.dynamo_table_arn
       }
     ]
   })
 }
 
-resource "aws_lambda_function" "funcao_um" {
-  function_name = "funcao-um-java"
+locals {
+  lambdas = [
+    {
+      name    = "funcao-um-java"
+      handler = "org.example.FuncaoUmHandler::handleRequest"
+      jar     = "${path.module}/../lambda/funcao-um/target/funcao-um-1.0-SNAPSHOT.jar"
+      timeout = 10
+    },
+    {
+      name    = "funcao-dois-java"
+      handler = "org.example.FuncaoDoisHandler::handleRequest"
+      jar     = "${path.module}/../lambda/funcao-dois/target/funcao-dois-1.0-SNAPSHOT.jar"
+      timeout = 30
+    },
+    {
+      name    = "funcao-tres-java"
+      handler = "org.example.FuncaoTresHandler::handleRequest"
+      jar     = "${path.module}/../lambda/funcao-tres/target/funcao-tres-1.0-SNAPSHOT.jar"
+      timeout = 30
+    },
+    {
+      name    = "funcao-quatro-java"
+      handler = "org.example.FuncaoQuatroHandler::handleRequest"
+      jar     = "${path.module}/../lambda/funcao-quatro/target/funcao-quatro-1.0-SNAPSHOT.jar"
+      timeout = 30
+    }
+  ]
+}
+
+resource "aws_lambda_function" "lambdas" {
+  for_each      = { for lambda in local.lambdas : lambda.name => lambda }
+  function_name = each.value.name
   role          = aws_iam_role.lambda_exec.arn
-  handler       = "org.example.FuncaoUmHandler::handleRequest"
+  handler       = each.value.handler
   runtime       = "java17"
-  filename      = "${path.module}/../lambda/funcao-um/target/funcao-um-1.0-SNAPSHOT.jar"
-  source_code_hash = filebase64sha256("${path.module}/../lambda/funcao-um/target/funcao-um-1.0-SNAPSHOT.jar")
-  timeout       = 10
+  filename      = each.value.jar
+  source_code_hash = filebase64sha256(each.value.jar)
+  timeout       = each.value.timeout
 
   depends_on = [
     aws_iam_role_policy_attachment.lambda_basic_execution,
     aws_iam_role_policy.lambda_dynamo_policy
   ]
 }
-
-resource "aws_lambda_function" "funcao_dois" {
-  function_name = "funcao-dois-java"
-  role          = aws_iam_role.lambda_exec.arn
-  handler       = "org.example.FuncaoDoisHandler::handleRequest"
-  runtime       = "java17"
-  filename      = "${path.module}/../lambda/funcao-dois/target/funcao-dois-1.0-SNAPSHOT.jar"
-  source_code_hash = filebase64sha256("${path.module}/../lambda/funcao-dois/target/funcao-dois-1.0-SNAPSHOT.jar")
-  timeout       = 30
-
-  depends_on = [
-    aws_iam_role_policy_attachment.lambda_basic_execution,
-    aws_iam_role_policy.lambda_dynamo_policy
-  ]
-}
-
-resource "aws_lambda_function" "funcao-tres" {
-  function_name = "funcao-tres-java"
-  role          = aws_iam_role.lambda_exec.arn
-  handler       = "org.example.FuncaoTresHandler::handleRequest"
-  runtime       = "java17"
-  filename      = "${path.module}/../lambda/funcao-tres/target/funcao-tres-1.0-SNAPSHOT.jar"
-  source_code_hash = filebase64sha256("${path.module}/../lambda/funcao-tres/target/funcao-tres-1.0-SNAPSHOT.jar")
-  timeout       = 30
-
-  depends_on = [
-    aws_iam_role_policy_attachment.lambda_basic_execution,
-    aws_iam_role_policy.lambda_dynamo_policy
-  ]
-}
-
-resource "aws_lambda_function" "funcao-quatro" {
-  function_name = "funcao-quatro-java"
-  role          = aws_iam_role.lambda_exec.arn
-  handler       = "org.example.FuncaoQuatroHandler::handleRequest"
-  runtime       = "java17"
-  filename      = "${path.module}/../lambda/funcao-quatro/target/funcao-quatro-1.0-SNAPSHOT.jar"
-  source_code_hash = filebase64sha256("${path.module}/../lambda/funcao-quatro/target/funcao-quatro-1.0-SNAPSHOT.jar")
-  timeout       = 30
-
-  depends_on = [
-    aws_iam_role_policy_attachment.lambda_basic_execution,
-    aws_iam_role_policy.lambda_dynamo_policy
-  ]
-}
-
